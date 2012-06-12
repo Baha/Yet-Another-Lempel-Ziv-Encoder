@@ -4,7 +4,7 @@
 class LempelZivEncoder
 {
 public:
-  virtual void encode() = 0;
+  virtual void encode(char *inputFileName) = 0;
 };
 
 #endif

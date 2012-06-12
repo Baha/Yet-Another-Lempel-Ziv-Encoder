@@ -1,7 +1,8 @@
 #include <cstring>
 
 #include "lempel_ziv.h"
-#include "lempel_ziv77.h"
+//#include "lempel_ziv77.h"
+#include "lempel_ziv78.h"
 
 #define LZ77 0
 #define LZ78 1
@@ -9,7 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-  int encoder_type = LZ77;
+  int encoder_type = LZ78;
   LempelZivEncoder *encoder = 0;
   
   if (argc == 3)
@@ -24,19 +25,20 @@ int main(int argc, char* argv[])
 
   switch (encoder_type)
   {
-    case LZ77:
+    /*case LZ77:
       encoder = new LempelZiv77Encoder();
-      break;
-    /*case LZ78:
+      break;*/
+    case LZ78:
       encoder = new LempelZiv78Encoder();
       break;
-    case LZW:
+    /*case LZW:
       encoder = new LempelZivWEncoder();
-      break;
-    */
+      break;*/
   }
 
-  encoder->encode();
+  if (argc == 2)
+    encoder->encode(argv[1]);
+  else encoder->encode(argv[2]);
 
   return 0;
 }
