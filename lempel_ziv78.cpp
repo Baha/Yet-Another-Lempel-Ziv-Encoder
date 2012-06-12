@@ -84,11 +84,40 @@ void LempelZiv78Encoder::getInstantCodes(char *inputFileName)
 
 void LempelZiv78Encoder::doEncoding(char *inputFileName)
 {
-  FILE *in = fopen(inputFileName, "r");
+  FILE *input;
+  FILE *output;
+  std::string outputFileName;
+  char* dotPointer;
   char c;
   std::string x("");
+  Binarizer* binarizer = new Binarizer();
 
-  c = fgetc(in);
+  input = fopen(inputFileName, "r");
+
+  if (input == NULL)
+  {
+    printf("Fichero de entrada no encontrado.\n");
+    exit(-1);
+  }
+
+  dotPointer = strchr(inputFileName, '.');
+
+  if (dotPointer != NULL)
+
+    *dotPointer = '\0';
+    
+  outputFileName = inputFileName;
+  outputFileName += ".lz78";
+
+  output = fopen(outputFileName.c_str(), "w");
+  
+  if (output == NULL)
+  {
+    printf("Fichero de salida no pudo crearse.\n");
+    exit(-1);
+  }
+
+  c = fgetc(input);
 
   while (c != EOF)
   {
@@ -98,6 +127,7 @@ void LempelZiv78Encoder::doEncoding(char *inputFileName)
     {
       if (stringExistsInDict(x))
       {
+        outputs.push_back(std::make_pair(getIndexOfString(x), c));
         printf("%d %c ", getIndexOfString(x), c);
         printf(" -- %d -- %s\n", dictionary.size() + 1, (x + c).c_str()); 
         dictionary[dictionary.size() + 1] = x + c;
@@ -105,26 +135,53 @@ void LempelZiv78Encoder::doEncoding(char *inputFileName)
       }
       else
       {
+        outputs.push_back(std::make_pair(0, c));
         dictionary[dictionary.size() + 1] = c;
         printf("0 %c\n", c);
       }
       x = "";
     }
-    c = fgetc(in);
+    c = fgetc(input);
   }
   
   if (x.size() != 0)
   {
     // emitimos la salida correspondiente a
+    std::string pref_x(x);
+    pref_x.erase(x.size() - 1);
+    outputs.push_back(std::make_pair(getIndexOfString(pref_x), x[x.size() - 1]));
     printf("%d ", getIndexOfString(x));
     printf(" -- ?? -- %s\n", x.c_str()); 
   }
 
   // guardamos eof en dicc. y imprimimos su entrada.
+  outputs.push_back(std::make_pair(0, c));
   dictionary[dictionary.size() + 1] = c;
   printf("0 %c\n", c);
 
+  // Ahora hay que imprimir las salidas
 
+  unsigned int index_bits = 1;
+
+  while (pow(2, index_bits) < dictionary.size()) index_bits++;
+  printf("ds: %d bits: %d\n", dictionary.size(), index_bits);
+
+  for (unsigned int i = 0; i < outputs.size(); i++)
+  {
+     binarizer->addStringToCode(toBinaryString(outputs[i].first, index_bits).c_str());
+     binarizer->addStringToCode(instant_codes[outputs[i].second].c_str());
+  }
+
+  fprintf(output, "%d %d\n", dictionary.size(), binarizer->getOffset());
+  for (unsigned int i = 0; i < dictionary.size(); i++)
+    fprintf(output, "%s\n", dictionary[i].c_str());
+
+  std::string code = binarizer->getBinaryCode();
+
+  fprintf(output, "%s", code.c_str());
+
+  fclose(input);
+  fclose(output);
 }
 
 void LempelZiv78Encoder::encode(char *inputFileName)
