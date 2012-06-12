@@ -5,6 +5,11 @@
 
 class LempelZiv77Encoder : public LempelZivEncoder
 {
+  unsigned int search_buffer_bits;
+  unsigned int lookahead_buffer_bits;
+  unsigned int search_buffer_size;
+  unsigned int lookahead_buffer_size;
+  char* sliding_window;
 public:
   void encode();
 };
