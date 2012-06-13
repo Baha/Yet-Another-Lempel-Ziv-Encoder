@@ -3,6 +3,7 @@
 #include "lempel_ziv.h"
 //#include "lempel_ziv77.h"
 #include "lempel_ziv78.h"
+#include "lempel_zivW.h"
 
 #define LZ77 0
 #define LZ78 1
@@ -31,9 +32,9 @@ int main(int argc, char* argv[])
     case LZ78:
       encoder = new LempelZiv78Encoder();
       break;
-    /*case LZW:
+    case LZW:
       encoder = new LempelZivWEncoder();
-      break;*/
+      break;
   }
 
   if (argc == 2)

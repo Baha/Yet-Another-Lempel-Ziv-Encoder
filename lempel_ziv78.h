@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "lempel_ziv.h"
-#include "code_pair.h"
 #include "binarizer.h"
 
 class LempelZiv78Encoder : public LempelZivEncoder
