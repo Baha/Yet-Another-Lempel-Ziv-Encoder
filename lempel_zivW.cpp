@@ -142,3 +142,7 @@ unsigned int LempelZivWEncoder::getIndexOfString(std::string new_string)
   for (it = dictionary.begin(); it != dictionary.end(); it++)
     if (new_string == (*it).second) return (*it).first;
 }
+
+void LempelZivWEncoder::decode(char *inputFileName, char *outputFileName)
+{
+}

@@ -206,3 +206,7 @@ unsigned int LempelZiv78Encoder::getIndexOfString(std::string new_string)
   for (it = dictionary.begin(); it != dictionary.end(); it++)
     if (new_string == (*it).second) return (*it).first;
 }
+
+void LempelZiv78Encoder::decode(char *inputFileName, char *outputFileName)
+{
+}

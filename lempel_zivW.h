@@ -18,6 +18,7 @@ public:
   void addFirstIndex(char* inputFileName);
   void doEncoding(char* inputFileName);
   void encode(char* inputFileName);
+  virtual void decode(char *inputFileName, char *outputFileName);
   bool stringExistsInDict(std::string);
   unsigned int getIndexOfString(std::string);
 };

@@ -112,13 +112,21 @@ protected:
 	 */
 	int offset;
 public:
-	Debinarizer();
+	/*Debinarizer();
 	void setOffset(int offset);
 	void addCharToString(char character);
 	void resetTempCode();
 	void readChar();
 	std::string getTempCode();
-	bool codesLeft();
+	bool codesLeft();*/
+};
+
+class DebinarizerForLZ78 : public Debinarizer
+{
+};
+
+class DebinarizerForLZW : public Debinarizer
+{
 };
 
 #endif
