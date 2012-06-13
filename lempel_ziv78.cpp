@@ -52,6 +52,8 @@ void LempelZiv78Encoder::getInstantCodes(char *inputFileName)
   for (it = symbolCounter.begin(); it != symbolCounter.end(); it++)
     alfabeto.push_back((*it).first);
 
+  sort(alfabeto.begin(), alfabeto.end());
+
   // Ahora tenemos que conseguir la codificacion para los caracteres
   
   int longitud = 1;
@@ -78,6 +80,9 @@ void LempelZiv78Encoder::getInstantCodes(char *inputFileName)
 
   for (unsigned int i = 0; i < n_simbolos; i++)
     instant_codes[alfabeto[i]] = codificaciones[i];
+
+  for (int i = 0; i < n_simbolos; i++)
+    printf("%c %s\n", alfabeto[i], instant_codes[alfabeto[i]].c_str());
 
   fclose(in);
 }
@@ -170,15 +175,17 @@ void LempelZiv78Encoder::doEncoding(char *inputFileName)
   {
      binarizer->addStringToCode(toBinaryString(outputs[i].first, index_bits).c_str());
      binarizer->addStringToCode(instant_codes[outputs[i].second].c_str());
+     //printf("%s %s\n", toBinaryString(outputs[i].first, index_bits).c_str(), instant_codes[outputs[i].second].c_str());
   }
 
-  fprintf(output, "%d %d\n", dictionary.size(), binarizer->getOffset());
-  for (unsigned int i = 0; i < dictionary.size(); i++)
-    fprintf(output, "%s\n", dictionary[i].c_str());
+  fprintf(output, "%d %d %d\n", dictionary.size(), binarizer->getCodeLength(), binarizer->getOffset());
+  for (unsigned int i = 1; i <= dictionary.size(); i++)
+    fprintf(output, "%d %s\n", dictionary[i].size(), dictionary[i].c_str());
 
   std::string code = binarizer->getBinaryCode();
 
-  fprintf(output, "%s", code.c_str());
+  for (unsigned int i = 0; i < binarizer->getCodeLength(); i++)
+    fprintf(output, "%c", code[i]);
 
   fclose(input);
   fclose(output);
@@ -209,4 +216,140 @@ unsigned int LempelZiv78Encoder::getIndexOfString(std::string new_string)
 
 void LempelZiv78Encoder::decode(char *inputFileName, char *outputFileName)
 {
+  FILE *input;
+  FILE *output;
+  unsigned int dict_size, n_chars, offset;
+  std::vector < char > alfabeto;
+  Debinarizer *debinarizer = new Debinarizer();
+
+  input = fopen(inputFileName, "r");
+
+  if (input == NULL)
+  {
+    printf("Fichero de entrada no encontrado.\n");
+    exit(-1);
+  }
+
+  output = fopen(outputFileName, "w");
+  
+  if (output == NULL)
+  {
+    printf("Fichero de salida no pudo crearse.\n");
+    exit(-1);
+  }
+  
+  fscanf(input, "%d %d %d\n", &dict_size, &n_chars, &offset);
+  
+  for (unsigned int i = 0; i < dict_size; i++)
+  {
+    std::string tmp_entry;
+    unsigned int n;
+    char c;
+
+    fscanf(input, "%d", &n);
+    c = fgetc(input); // borrar blanco
+
+    for (unsigned int j = 0; j < n; j++)
+    {
+      c = fgetc(input);
+      tmp_entry.push_back(c);
+    }
+
+    c = fgetc(input); // borrar \n
+    if (n == 1)
+      alfabeto.push_back(tmp_entry[0]);
+    dictionary[i + 1] = tmp_entry;
+  }
+
+  sort(alfabeto.begin(), alfabeto.end());
+
+  unsigned int longitud = 1;
+  std::vector < unsigned int > longitudes;
+  std::vector < std::string > codificaciones;
+
+  while (pow(2, longitud) < alfabeto.size()) longitud++;
+
+  for (unsigned int i = 0; i < alfabeto.size(); i++)
+    longitudes.push_back(longitud);
+
+  std::string zero_vector;
+  
+  for (unsigned int i = 0; i < longitud; i++)
+    zero_vector.push_back('0');
+
+  codificaciones.push_back(zero_vector);
+
+  for (unsigned int i = 1; i < alfabeto.size(); i++)
+    codificaciones.push_back(sucStr(codificaciones[i - 1]));
+
+
+  for (unsigned int i = 0; i < alfabeto.size(); i++)
+    instant_codes[alfabeto[i]] = codificaciones[i];
+ 
+  for (int i = 0; i < alfabeto.size(); i++)
+    printf("%c %s\n", alfabeto[i], instant_codes[alfabeto[i]].c_str());
+
+  // Hasta aqui ya se ha recuperado el alfabeto original y sus codigos instantaneos.
+
+  unsigned int index_bits = 1;
+
+  while (pow(2, index_bits) < dictionary.size()) index_bits++;
+  
+  unsigned int total_bits = index_bits + longitud;
+
+  printf("ds: %d bits: %d total: %d\n", dictionary.size(), index_bits, total_bits);
+
+  // lectura de binario
+
+  debinarizer->setOffset(offset);
+
+  for (unsigned int i = 0; i < n_chars; i++)
+  {
+    char c = fgetc(input);
+    debinarizer->addCharToString(c);
+  }
+
+  while (debinarizer->codesLeft())
+  {
+    unsigned int cur_index;
+    std::string cur_code;
+    char cur_symbol;
+    std::map < char, std::string >::iterator it;
+
+    cur_index = binStringToInteger(debinarizer->getStringOfNBits(index_bits));
+    cur_code = debinarizer->getStringOfNBits(longitud);
+
+    for (it = instant_codes.begin(); it != instant_codes.end(); it++)
+      if ((*it).second == cur_code)
+      {
+        cur_symbol = (*it).first;
+        break;
+      }
+
+    if (cur_index != 0)
+      fprintf(output, "%s%c", dictionary[cur_index].c_str(), cur_symbol);
+    else if (cur_symbol != EOF)
+      fprintf(output, "%c", cur_symbol);
+    else 
+      fprintf(output, "\0");
+
+    /*while (cur_index != 0)
+    {
+      std::string tmp_entry = dictionary[cur_index];
+      std::map < unsigned int, std::string >::iterator it;
+
+      tmp_entry.erase(tmp_entry.size() - 1);
+
+      for (it = dictionary.begin(); it != dictionary.end(); it++)
+      {
+        if ((*it).second == tmp_entry)
+        {
+          cur_index = (*it).first;
+          cur_
+        }
+      }
+    }*/
+
+  }
+
 }

@@ -26,7 +26,7 @@ int Binarizer::getCodeLength()
  */
 int Binarizer::getOffset()
 {
-  finalizeEncoding();
+  finalizeEncoding(); 
   return this->offset;
 }
 
@@ -103,6 +103,7 @@ void Binarizer::processChar(char bit)
 
 	if (bits_used == BYTE_LENGTH)
 	{
+
 		binaryCode.push_back(cur_byte);
 		cur_byte = 0;
 		bits_used = 0;
@@ -130,4 +131,66 @@ std::string Binarizer::printCode()
 {
 	finalizeEncoding();
 	return this->binaryCode;
+}
+
+/**
+ * The void constructor for the Binarizer.
+ * Resets the attributes from it.
+ */
+Debinarizer::Debinarizer()
+{
+	binaryCode = "";
+	tempCode = "";
+	cur_char = 0;
+}
+
+/**
+ * A setter for the "offset" attribute.
+ */
+void Debinarizer::setOffset(int offset)
+{
+	this->offset = offset;
+}
+
+/**
+ * This methods parses every bit from the character
+ * and adds '1' or '0' depending on its bits.
+ *
+ * @param character The character to be parsed.
+ */
+void Debinarizer::addCharToString(char character)
+{
+	for (int i = 0; i < BYTE_LENGTH; i++)
+	{
+		if (((character >> i) & 0x01) == 1)
+			binaryCode.push_back('1');
+		else binaryCode.push_back('0');
+	}
+}
+
+/**
+ * Resets the attribute "tempCode".
+ */
+void Debinarizer::resetTempCode()
+{
+	tempCode = "";
+}
+
+std::string Debinarizer::getStringOfNBits(unsigned int n)
+{
+  resetTempCode();
+  for (unsigned int i = 0; i < n; i++)
+  {
+    tempCode.push_back(binaryCode[cur_char]);
+    cur_char++;
+  }
+  return tempCode;
+}
+/**
+ * A method to know if we have characters left
+ * to read.
+ */
+bool Debinarizer::codesLeft()
+{
+	return (cur_char != (binaryCode.size() - offset));
 }

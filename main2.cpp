@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   int encoder_type = LZ78;
   LempelZivEncoder *encoder = 0;
   
-  if (argc == 3)
+  if (argc == 4)
   {
     if (!strcmp(argv[1], "-lz77"))
       encoder_type = LZ77;
@@ -37,9 +37,10 @@ int main(int argc, char* argv[])
       break;
   }
 
-  if (argc == 2)
+  if (argc == 3)
     encoder->decode(argv[1], argv[2]);
-  else encoder->decode(argv[2], argv[3]);
+  else
+    encoder->decode(argv[2], argv[3]);
 
   return 0;
 }

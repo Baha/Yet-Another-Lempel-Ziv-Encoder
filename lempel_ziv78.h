@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 #include "lempel_ziv.h"
 #include "binarizer.h"
@@ -17,7 +18,7 @@ class LempelZiv78Encoder : public LempelZivEncoder
   std::vector < std::pair < unsigned int, char > > outputs;
 public:
   void encode(char *inputFileName);
-  virtual void decode(char *inputFileName, char *outputFileName);
+  void decode(char *inputFileName, char *outputFileName);
   bool stringExistsInDict(std::string new_string);
   unsigned int getIndexOfString(std::string new_string);
   void getInstantCodes(char *inputFileName);
