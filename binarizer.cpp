@@ -176,6 +176,12 @@ void Debinarizer::resetTempCode()
 	tempCode = "";
 }
 
+/**
+ * This methods gives us the next substring from the "binaryCode"
+ * string with length n.
+ *
+ * @param n The length of the substring we want to get.
+ */
 std::string Debinarizer::getStringOfNBits(unsigned int n)
 {
   resetTempCode();

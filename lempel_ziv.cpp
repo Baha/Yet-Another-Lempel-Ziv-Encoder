@@ -1,6 +1,13 @@
 #include "lempel_ziv.h"
 #include <cstdio>
 
+/**
+ * This methods return a binary string of characters of length n for the
+ * number given.
+ *
+ * @param number The number to be codified in binary.
+ * @param n The length of the string it should return.
+ */
 std::string LempelZivEncoder::toBinaryString(unsigned int number, unsigned int n)
 {
   std::string new_string("");
@@ -16,6 +23,12 @@ std::string LempelZivEncoder::toBinaryString(unsigned int number, unsigned int n
   return new_string;
 }
 
+/**
+ * This method does the opposite to the method "toBinaryString". It
+ * parses a binary string and return the number it represents.
+ *
+ * @param bin_string The string to be parsed by the method.
+ */
 unsigned int LempelZivEncoder::binStringToInteger(std::string bin_string)
 {
   unsigned int num = 0;

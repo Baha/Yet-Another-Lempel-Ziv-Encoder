@@ -2,6 +2,12 @@
 #include <math.h>
 #include "lempel_ziv78.h"
 
+/**
+ * This methods returns the successor char in the alphabet
+ * {0,1} (binary alphabet).
+ *
+ * @param char_suc The character whose successor we want to get.
+ */
 char LempelZiv78Encoder::sucChar(char char_suc)
 {
   if (char_suc == '1')
@@ -9,6 +15,13 @@ char LempelZiv78Encoder::sucChar(char char_suc)
   return '1';
 }
 
+/**
+ * This method returns the successor string in the alphabet {0,1}
+ * for a given string.
+ *
+ * @param string_suc The string whose successor we want to get.
+
+ */
 std::string LempelZiv78Encoder::sucStr(std::string string_suc)
 {
   std::string new_string(string_suc);
@@ -22,6 +35,14 @@ std::string LempelZiv78Encoder::sucStr(std::string string_suc)
     return new_string + sucChar(string_suc[string_suc.size() - 1]);
 }
 
+/**
+ * This method parses the file for the first time and gets the
+ * number of symbols that appear. It also gets the instant codes
+ * for each one of the symbols appeared, storing them on the
+ * "instant_codes" attribute.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZiv78Encoder::getInstantCodes(char *inputFileName)
 {
   FILE *in = fopen(inputFileName, "r");
@@ -87,6 +108,13 @@ void LempelZiv78Encoder::getInstantCodes(char *inputFileName)
   fclose(in);
 }
 
+/**
+ * This method performs the real encoding process. It opens
+ * the files for input and output, and then executes the LZ78
+ * algorithm, writing the outputs in the output file.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZiv78Encoder::doEncoding(char *inputFileName)
 {
   FILE *input;
@@ -191,12 +219,24 @@ void LempelZiv78Encoder::doEncoding(char *inputFileName)
   fclose(output);
 }
 
+/**
+ * This method is a wrapper for performing the instant
+ * codes obtention and then the encoding process.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZiv78Encoder::encode(char *inputFileName)
 {
   getInstantCodes(inputFileName);
   doEncoding(inputFileName);
 }
 
+/**
+ * This method is a boolean method for knowing if the given
+ * string is already in the dictionary.
+ *
+ * @param new_string The string we are looking for in the dictionary.
+ */
 bool LempelZiv78Encoder::stringExistsInDict(std::string new_string)
 {
   std::map < unsigned int, std::string >::iterator it;
@@ -206,6 +246,11 @@ bool LempelZiv78Encoder::stringExistsInDict(std::string new_string)
   return false;
 }
 
+/**
+ * This method gives us the index in the dictionary for a given string.
+ *
+ * @param new_string The string whose index we are looking for in the dictionary.
+ */
 unsigned int LempelZiv78Encoder::getIndexOfString(std::string new_string)
 {
   std::map < unsigned int, std::string >::iterator it;
@@ -214,6 +259,14 @@ unsigned int LempelZiv78Encoder::getIndexOfString(std::string new_string)
     if (new_string == (*it).second) return (*it).first;
 }
 
+/**
+ * This method performs the decoding process for the LZ78 algorithm. It first
+ * obtains the instant codes for the alphabet, then it debinarizes the sequence
+ * of bits in the file and then it write the uncodified file in the output file.
+ *
+ * @param inputFileName The name of the input file.
+ * @param outputFileName The name of the output file.
+ */ 
 void LempelZiv78Encoder::decode(char *inputFileName, char *outputFileName)
 {
   FILE *input;

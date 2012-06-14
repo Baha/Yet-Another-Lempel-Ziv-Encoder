@@ -2,6 +2,12 @@
 #include <math.h>
 #include "lempel_zivW.h"
 
+/**
+ * This method inserts the symbols at the beggining of
+ * the dictionary by doing a first parsing of the input file.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZivWEncoder::addFirstIndex(char *inputFileName)
 {
   FILE *in = fopen(inputFileName, "r");
@@ -32,6 +38,13 @@ void LempelZivWEncoder::addFirstIndex(char *inputFileName)
   fclose(in);
 }
 
+/**
+ * This method performs the real encoding process. It opens
+ * the files for input and output, and then executes the LZW
+ * algorithm, writing the outputs in the output file.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZivWEncoder::doEncoding(char *inputFileName)
 {
   FILE *input;
@@ -120,12 +133,24 @@ void LempelZivWEncoder::doEncoding(char *inputFileName)
   fclose(output);
 }
 
+/**
+ * This method is a wrapper for performing the addition
+ * of the symbols in the dictionary and then the encoding process.
+ *
+ * @param inputFileName The name of the input file.
+ */
 void LempelZivWEncoder::encode(char *inputFileName)
 {
   addFirstIndex(inputFileName);
   doEncoding(inputFileName);
 }
 
+/**
+ * This method is a boolean method for knowing if the given
+ * string is already in the dictionary.
+ *
+ * @param new_string The string we are looking for in the dictionary.
+ */
 bool LempelZivWEncoder::stringExistsInDict(std::string new_string)
 {
   std::map < unsigned int, std::string >::iterator it;
@@ -135,6 +160,11 @@ bool LempelZivWEncoder::stringExistsInDict(std::string new_string)
   return false;
 }
 
+/**
+ * This method gives us the index in the dictionary for a given string.
+ *
+ * @param new_string The string whose index we are looking for in the dictionary.
+ */
 unsigned int LempelZivWEncoder::getIndexOfString(std::string new_string)
 {
   std::map < unsigned int, std::string >::iterator it;
@@ -143,6 +173,14 @@ unsigned int LempelZivWEncoder::getIndexOfString(std::string new_string)
     if (new_string == (*it).second) return (*it).first;
 }
 
+/**
+ * This method performs the decoding process for the LZ78 algorithm. It first
+ * obtains the instant codes for the alphabet, then it debinarizes the sequence
+ * of bits in the file and then it write the uncodified file in the output file.
+ *
+ * @param inputFileName The name of the input file.
+ * @param outputFileName The name of the output file.
+ */ 
 void LempelZivWEncoder::decode(char *inputFileName, char *outputFileName)
 {
 }

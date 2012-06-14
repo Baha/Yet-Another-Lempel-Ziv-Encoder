@@ -14,6 +14,9 @@
 #include <cstring>
 #include <iostream>
 
+/**
+ * The length of a byte.
+ */
 #define BYTE_LENGTH 8
 
 /**
